@@ -1,4 +1,5 @@
 """Brightness override number entity (slider 0-100%)."""
+
 from __future__ import annotations
 
 from homeassistant.components.number import NumberEntity, NumberMode

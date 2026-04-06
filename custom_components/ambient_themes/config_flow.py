@@ -1,4 +1,5 @@
 """Config and options flow for Ambient Themes."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -49,9 +50,7 @@ class AmbientThemesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
-    async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.FlowResult:
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.FlowResult:
         if user_input is not None:
             area_id = user_input[CONF_AREA_ID]
             await self.async_set_unique_id(f"{DOMAIN}_{area_id}")
@@ -82,9 +81,7 @@ class AmbientThemesOptionsFlow(config_entries.OptionsFlow):
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         self._config_entry = config_entry
 
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.FlowResult:
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> config_entries.FlowResult:
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
@@ -109,12 +106,18 @@ class AmbientThemesOptionsFlow(config_entries.OptionsFlow):
                 ): BooleanSelector(),
                 vol.Optional(
                     CONF_CYCLE_INTERVAL, default=opts.get(CONF_CYCLE_INTERVAL, DEFAULT_CYCLE_INTERVAL)
-                ): NumberSelector(NumberSelectorConfig(min=10, max=3600, step=10, unit_of_measurement="s", mode=NumberSelectorMode.BOX)),
-                vol.Optional(
-                    CONF_TRANSITION, default=opts.get(CONF_TRANSITION, DEFAULT_TRANSITION)
-                ): NumberSelector(NumberSelectorConfig(min=0, max=60, step=1, unit_of_measurement="s", mode=NumberSelectorMode.SLIDER)),
+                ): NumberSelector(
+                    NumberSelectorConfig(
+                        min=10, max=3600, step=10, unit_of_measurement="s", mode=NumberSelectorMode.BOX
+                    )
+                ),
+                vol.Optional(CONF_TRANSITION, default=opts.get(CONF_TRANSITION, DEFAULT_TRANSITION)): NumberSelector(
+                    NumberSelectorConfig(min=0, max=60, step=1, unit_of_measurement="s", mode=NumberSelectorMode.SLIDER)
+                ),
                 vol.Optional(CONF_CONTRAST, default=opts.get(CONF_CONTRAST, DEFAULT_CONTRAST)): NumberSelector(
-                    NumberSelectorConfig(min=0, max=100, step=5, unit_of_measurement="%", mode=NumberSelectorMode.SLIDER)
+                    NumberSelectorConfig(
+                        min=0, max=100, step=5, unit_of_measurement="%", mode=NumberSelectorMode.SLIDER
+                    )
                 ),
                 vol.Optional(
                     CONF_BRIGHTNESS_CURVE, default=opts.get(CONF_BRIGHTNESS_CURVE, DEFAULT_BRIGHTNESS_CURVE)

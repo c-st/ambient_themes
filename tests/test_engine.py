@@ -1,4 +1,5 @@
 """Tests for the ThemeEngine."""
+
 from __future__ import annotations
 
 from homeassistant.components.light import (
@@ -203,8 +204,5 @@ class TestBrightnessCurve:
         assert engine._get_current_brightness() == warm_glow_theme.default_brightness
 
     async def test_override_takes_precedence_over_curve(self, mock_hass, warm_glow_theme, rgb_light):
-        engine = ThemeEngine(
-            mock_hass, [rgb_light], warm_glow_theme,
-            brightness_curve=True, brightness_override=42
-        )
+        engine = ThemeEngine(mock_hass, [rgb_light], warm_glow_theme, brightness_curve=True, brightness_override=42)
         assert engine._get_current_brightness() == 42

@@ -1,4 +1,5 @@
 """Tests for the themes module."""
+
 import dataclasses
 
 import pytest
@@ -84,9 +85,16 @@ class TestTheme:
 class TestBuiltinThemes:
     def test_all_ten_themes_registered(self):
         expected_ids = {
-            "warm_glow", "midsummer_night", "nordic_twilight", "autumn_garden",
-            "moonlight", "tropical_evening", "candlelight", "winter_frost",
-            "deep_forest", "party",
+            "warm_glow",
+            "midsummer_night",
+            "nordic_twilight",
+            "autumn_garden",
+            "moonlight",
+            "tropical_evening",
+            "candlelight",
+            "winter_frost",
+            "deep_forest",
+            "party",
         }
         assert set(BUILTIN_THEMES.keys()) == expected_ids
 

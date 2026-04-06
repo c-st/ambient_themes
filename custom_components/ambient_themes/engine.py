@@ -1,4 +1,5 @@
 """Theme engine — applies a theme to a set of managed lights."""
+
 from __future__ import annotations
 
 import asyncio
@@ -85,6 +86,7 @@ class ThemeEngine:
                 import datetime as dt
 
                 from homeassistant.util.dt import as_utc
+
                 sunset = as_utc(dt.datetime.combine(today, sunset.time()))
 
             minutes_since_sunset = (now - sunset).total_seconds() / 60
@@ -119,7 +121,7 @@ class ThemeEngine:
         # Smart shuffle: start random, then pick from closest-hue half of remaining
         start_idx = random.randrange(len(colors))
         result = [colors[start_idx]]
-        remaining = colors[:start_idx] + colors[start_idx + 1:]
+        remaining = colors[:start_idx] + colors[start_idx + 1 :]
 
         while remaining:
             last_hue = result[-1].hue
@@ -177,11 +179,7 @@ class ThemeEngine:
             brightness_val = self._brightness_pct_to_value(brightnesses[i])
 
             if light.role == LightRole.COLOR_CARRIER:
-                color = (
-                    color_assignment[color_idx]
-                    if color_idx < len(color_assignment)
-                    else self._theme.palette[0]
-                )
+                color = color_assignment[color_idx] if color_idx < len(color_assignment) else self._theme.palette[0]
                 color_idx += 1
                 data = {
                     "entity_id": light.entity_id,
@@ -206,9 +204,7 @@ class ThemeEngine:
             else:  # PARTICIPANT
                 data = {"entity_id": light.entity_id}
 
-            tasks.append(
-                self._hass.services.async_call(LIGHT_DOMAIN, SERVICE_TURN_ON, data, blocking=False)
-            )
+            tasks.append(self._hass.services.async_call(LIGHT_DOMAIN, SERVICE_TURN_ON, data, blocking=False))
 
         await asyncio.gather(*tasks)
 
@@ -234,8 +230,7 @@ class ThemeEngine:
             if not self._running:
                 break
             any_on = any(
-                (state := self._hass.states.get(lt.entity_id)) is not None
-                and state.state == STATE_ON
+                (state := self._hass.states.get(lt.entity_id)) is not None and state.state == STATE_ON
                 for lt in self._lights
             )
             if not any_on:

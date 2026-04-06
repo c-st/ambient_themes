@@ -1,4 +1,5 @@
 """Light role detection and management for the Ambient Themes integration."""
+
 from __future__ import annotations
 
 import contextlib
@@ -12,9 +13,15 @@ from homeassistant.helpers import entity_registry as er
 from .const import LightRole
 
 # ColorMode enum members that indicate full color support
-_COLOR_CARRIER_MODES: frozenset[ColorMode] = frozenset({
-    ColorMode.HS, ColorMode.XY, ColorMode.RGB, ColorMode.RGBW, ColorMode.RGBWW,
-})
+_COLOR_CARRIER_MODES: frozenset[ColorMode] = frozenset(
+    {
+        ColorMode.HS,
+        ColorMode.XY,
+        ColorMode.RGB,
+        ColorMode.RGBW,
+        ColorMode.RGBWW,
+    }
+)
 
 # String equivalents (capabilities may arrive as strings from entity registry)
 _COLOR_CARRIER_STRINGS: frozenset[str] = frozenset({"hs", "xy", "rgb", "rgbw", "rgbww"})
@@ -96,21 +103,13 @@ async def discover_area_lights(
 
     # Lights directly assigned to the area
     for entry in er.async_entries_for_area(entity_reg, area_id):
-        if (
-            entry.domain == "light"
-            and not entry.disabled_by
-            and entry.entity_id not in excluded
-        ):
+        if entry.domain == "light" and not entry.disabled_by and entry.entity_id not in excluded:
             found_entity_ids.add(entry.entity_id)
 
     # Lights on devices assigned to the area
     for device in dr.async_entries_for_area(device_reg, area_id):
         for entry in er.async_entries_for_device(entity_reg, device.id):
-            if (
-                entry.domain == "light"
-                and not entry.disabled_by
-                and entry.entity_id not in excluded
-            ):
+            if entry.domain == "light" and not entry.disabled_by and entry.entity_id not in excluded:
                 found_entity_ids.add(entry.entity_id)
 
     result: list[ManagedLight] = []

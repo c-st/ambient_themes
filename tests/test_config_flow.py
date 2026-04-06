@@ -1,4 +1,5 @@
 """Tests for the config and options flow."""
+
 from __future__ import annotations
 
 import pytest
@@ -24,9 +25,7 @@ def auto_enable_custom_integrations(enable_custom_integrations):
 
 async def test_user_step_shows_form(hass: HomeAssistant) -> None:
     """The user step should show a form with step_id 'user'."""
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": config_entries.SOURCE_USER}
-    )
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
     assert result["type"] == FlowResultType.FORM
     assert result["step_id"] == "user"
 
@@ -34,17 +33,14 @@ async def test_user_step_shows_form(hass: HomeAssistant) -> None:
 async def test_user_step_creates_entry(hass: HomeAssistant) -> None:
     """Submitting a valid area_id should create a config entry."""
     from homeassistant.helpers import area_registry as ar
+
     area_registry = ar.async_get(hass)
     area = area_registry.async_create("Living Room")
 
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": config_entries.SOURCE_USER}
-    )
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
     assert result["type"] == FlowResultType.FORM
 
-    result2 = await hass.config_entries.flow.async_configure(
-        result["flow_id"], user_input={CONF_AREA_ID: area.id}
-    )
+    result2 = await hass.config_entries.flow.async_configure(result["flow_id"], user_input={CONF_AREA_ID: area.id})
     assert result2["type"] == FlowResultType.CREATE_ENTRY
     assert result2["title"] == "Ambient: Living Room"
     assert result2["data"][CONF_AREA_ID] == area.id
@@ -53,24 +49,17 @@ async def test_user_step_creates_entry(hass: HomeAssistant) -> None:
 async def test_user_step_aborts_duplicate(hass: HomeAssistant) -> None:
     """Configuring the same area twice should abort."""
     from homeassistant.helpers import area_registry as ar
+
     area_registry = ar.async_get(hass)
     area = area_registry.async_create("Kitchen")
 
     # First entry
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": config_entries.SOURCE_USER}
-    )
-    await hass.config_entries.flow.async_configure(
-        result["flow_id"], user_input={CONF_AREA_ID: area.id}
-    )
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
+    await hass.config_entries.flow.async_configure(result["flow_id"], user_input={CONF_AREA_ID: area.id})
 
     # Second attempt — should abort
-    result2 = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": config_entries.SOURCE_USER}
-    )
-    result3 = await hass.config_entries.flow.async_configure(
-        result2["flow_id"], user_input={CONF_AREA_ID: area.id}
-    )
+    result2 = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
+    result3 = await hass.config_entries.flow.async_configure(result2["flow_id"], user_input={CONF_AREA_ID: area.id})
     assert result3["type"] == FlowResultType.ABORT
     assert result3["reason"] == "already_configured"
 
@@ -78,6 +67,7 @@ async def test_user_step_aborts_duplicate(hass: HomeAssistant) -> None:
 async def test_options_flow_shows_form(hass: HomeAssistant) -> None:
     """The options flow init step should show a form."""
     from homeassistant.helpers import area_registry as ar
+
     area_registry = ar.async_get(hass)
     area = area_registry.async_create("Bedroom")
 
@@ -96,6 +86,7 @@ async def test_options_flow_shows_form(hass: HomeAssistant) -> None:
 async def test_options_flow_saves_all_fields(hass: HomeAssistant) -> None:
     """Submitting the options form should save all provided fields."""
     from homeassistant.helpers import area_registry as ar
+
     area_registry = ar.async_get(hass)
     area = area_registry.async_create("Office")
 
@@ -119,9 +110,7 @@ async def test_options_flow_saves_all_fields(hass: HomeAssistant) -> None:
         "brightness_curve": False,
         "survive_restart": True,
     }
-    result2 = await hass.config_entries.options.async_configure(
-        result["flow_id"], user_input=user_input
-    )
+    result2 = await hass.config_entries.options.async_configure(result["flow_id"], user_input=user_input)
     assert result2["type"] == FlowResultType.CREATE_ENTRY
     assert entry.options[CONF_THEME_ID] == "party"
     assert entry.options[CONF_DYNAMIC] is True
@@ -131,6 +120,7 @@ async def test_options_flow_saves_all_fields(hass: HomeAssistant) -> None:
 async def test_options_flow_defaults_from_existing_options(hass: HomeAssistant) -> None:
     """The options form should pre-populate with existing option values."""
     from homeassistant.helpers import area_registry as ar
+
     area_registry = ar.async_get(hass)
     area = area_registry.async_create("Hallway")
 
