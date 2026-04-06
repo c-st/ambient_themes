@@ -66,6 +66,12 @@ class TestDetectRole:
     def test_mixed_enum_and_string(self):
         assert detect_role({ColorMode.COLOR_TEMP, "hs"}) == LightRole.COLOR_CARRIER
 
+    def test_white_mode_is_atmosphere_carrier(self):
+        assert detect_role({ColorMode.WHITE}) == LightRole.ATMOSPHERE_CARRIER
+
+    def test_string_white_mode(self):
+        assert detect_role({"white"}) == LightRole.ATMOSPHERE_CARRIER
+
 
 class TestManagedLight:
     """Tests for ManagedLight properties."""

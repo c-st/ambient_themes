@@ -26,7 +26,7 @@ _COLOR_CARRIER_MODES: frozenset[ColorMode] = frozenset(
 # String equivalents (capabilities may arrive as strings from entity registry)
 _COLOR_CARRIER_STRINGS: frozenset[str] = frozenset({"hs", "xy", "rgb", "rgbw", "rgbww"})
 _TEMP_STRINGS: frozenset[str] = frozenset({"color_temp"})
-_BRIGHTNESS_STRINGS: frozenset[str] = frozenset({"brightness"})
+_BRIGHTNESS_STRINGS: frozenset[str] = frozenset({"brightness", "white"})
 
 
 def detect_role(supported_color_modes: set | list | None) -> LightRole:
@@ -56,7 +56,7 @@ def detect_role(supported_color_modes: set | list | None) -> LightRole:
         return LightRole.COLOR_CARRIER
     if ColorMode.COLOR_TEMP in enum_modes or string_modes & _TEMP_STRINGS:
         return LightRole.TEMPERATURE_CARRIER
-    if ColorMode.BRIGHTNESS in enum_modes or string_modes & _BRIGHTNESS_STRINGS:
+    if ColorMode.BRIGHTNESS in enum_modes or ColorMode.WHITE in enum_modes or string_modes & _BRIGHTNESS_STRINGS:
         return LightRole.ATMOSPHERE_CARRIER
     return LightRole.PARTICIPANT
 
