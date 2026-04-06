@@ -7,7 +7,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import area_registry as ar
 
 from .const import (
-    CONF_AREA_ID,
+    CONF_AREA_IDS,
     CONF_BRIGHTNESS_CURVE,
     CONF_CONTRAST,
     CONF_CYCLE_INTERVAL,
@@ -44,14 +44,22 @@ class AmbientInstance:
         self._lights: list[ManagedLight] = []
 
     @property
+    def area_ids(self) -> list[str]:
+        return list(self._entry.data[CONF_AREA_IDS])
+
+    @property
     def area_id(self) -> str:
-        return self._entry.data[CONF_AREA_ID]
+        """Stable key used for entity unique IDs and device identifiers."""
+        ids = self.area_ids
+        return ids[0] if len(ids) == 1 else "_".join(ids)
 
     @property
     def area_name(self) -> str:
         area_reg = ar.async_get(self._hass)
-        area = area_reg.async_get_area(self.area_id)
-        return area.name if area else self.area_id
+        names = [
+            (area_reg.async_get_area(aid).name or aid) if area_reg.async_get_area(aid) else aid for aid in self.area_ids
+        ]
+        return " + ".join(names)
 
     @property
     def theme_id(self) -> str:
@@ -74,9 +82,16 @@ class AmbientInstance:
         return self._lights
 
     async def refresh_lights(self) -> None:
-        """Re-discover lights in the area from the entity/device registry."""
+        """Re-discover lights across all configured areas, deduplicating by entity ID."""
         excluded = self._entry.options.get(CONF_EXCLUDED_ENTITIES, DEFAULT_EXCLUDED_ENTITIES)
-        self._lights = await discover_area_lights(self._hass, self.area_id, excluded)
+        seen: set[str] = set()
+        lights: list[ManagedLight] = []
+        for aid in self.area_ids:
+            for light in await discover_area_lights(self._hass, aid, excluded):
+                if light.entity_id not in seen:
+                    seen.add(light.entity_id)
+                    lights.append(light)
+        self._lights = lights
 
     async def activate(self) -> None:
         """Start the ambient engine, stopping any previous one first."""

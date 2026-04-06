@@ -10,6 +10,7 @@ from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers.selector import (
     AreaSelector,
+    AreaSelectorConfig,
     BooleanSelector,
     EntitySelector,
     EntitySelectorConfig,
@@ -22,7 +23,7 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import (
-    CONF_AREA_ID,
+    CONF_AREA_IDS,
     CONF_BRIGHTNESS_CURVE,
     CONF_CONTRAST,
     CONF_CYCLE_INTERVAL,
@@ -57,22 +58,21 @@ class AmbientThemesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
-            area_id = user_input[CONF_AREA_ID]
-            await self.async_set_unique_id(f"{DOMAIN}_{area_id}")
+            area_ids: list[str] = sorted(user_input[CONF_AREA_IDS])
+            unique_key = "_".join(area_ids)
+            await self.async_set_unique_id(f"{DOMAIN}_{unique_key}")
             self._abort_if_unique_id_configured()
 
             area_reg = ar.async_get(self.hass)
-            area = area_reg.async_get_area(area_id)
-            area_name = area.name if area else area_id
-
+            names = [(area_reg.async_get_area(aid).name if area_reg.async_get_area(aid) else aid) for aid in area_ids]
             return self.async_create_entry(
-                title=f"Ambient: {area_name}",
-                data={CONF_AREA_ID: area_id},
+                title="Ambient: " + " + ".join(names),
+                data={CONF_AREA_IDS: area_ids},
             )
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({vol.Required(CONF_AREA_ID): AreaSelector()}),
+            data_schema=vol.Schema({vol.Required(CONF_AREA_IDS): AreaSelector(AreaSelectorConfig(multiple=True))}),
         )
 
     @staticmethod

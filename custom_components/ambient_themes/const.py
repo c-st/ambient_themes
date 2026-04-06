@@ -8,7 +8,7 @@ DOMAIN = "ambient_themes"
 PLATFORMS = ["switch", "select", "number", "sensor"]
 
 # Configuration keys
-CONF_AREA_ID = "area_id"
+CONF_AREA_IDS = "area_ids"
 CONF_EXCLUDED_ENTITIES = "excluded_entities"
 CONF_THEME_ID = "theme_id"
 CONF_DYNAMIC = "dynamic"

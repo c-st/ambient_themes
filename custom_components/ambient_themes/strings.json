@@ -5,7 +5,10 @@
         "title": "Ambient Themes",
         "description": "Select the Home Assistant area to control with ambient themes.",
         "data": {
-          "area_id": "Area"
+          "area_ids": "Areas"
+        },
+        "data_description": {
+          "area_ids": "Select one or more Home Assistant areas to control together."
         }
       }
     },
