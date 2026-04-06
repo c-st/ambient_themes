@@ -111,10 +111,12 @@ class TestApply:
         await engine.apply()
         call_args = mock_hass.services.async_call.call_args_list[0]
         data = call_args[0][2]
+        target = call_args[1]["target"]
         assert ATTR_HS_COLOR in data
         assert ATTR_BRIGHTNESS in data
         assert data[ATTR_TRANSITION] == 10
         assert ATTR_COLOR_TEMP not in data
+        assert target == {"entity_id": rgb_light.entity_id}
 
     async def test_cct_light_gets_color_temp_not_hs(self, mock_hass, warm_glow_theme, cct_light):
         engine = ThemeEngine(mock_hass, [cct_light], warm_glow_theme)
@@ -134,12 +136,14 @@ class TestApply:
         assert ATTR_HS_COLOR not in data
         assert ATTR_COLOR_TEMP not in data
 
-    async def test_participant_gets_entity_id_only(self, mock_hass, warm_glow_theme, onoff_light):
+    async def test_participant_gets_empty_data_with_target(self, mock_hass, warm_glow_theme, onoff_light):
         engine = ThemeEngine(mock_hass, [onoff_light], warm_glow_theme)
         await engine.apply()
         call_args = mock_hass.services.async_call.call_args_list[0]
         data = call_args[0][2]
-        assert data == {"entity_id": onoff_light.entity_id}
+        target = call_args[1]["target"]
+        assert data == {}
+        assert target == {"entity_id": onoff_light.entity_id}
 
     async def test_brightness_override_used(self, mock_hass, warm_glow_theme, rgb_light):
         engine = ThemeEngine(mock_hass, [rgb_light], warm_glow_theme, brightness_override=50)
@@ -170,6 +174,7 @@ class TestTurnOffLights:
             assert call[0][1] == SERVICE_TURN_OFF
             data = call[0][2]
             assert data[ATTR_TRANSITION] == 5
+            assert call[1]["target"]["entity_id"] in [lt.entity_id for lt in mixed_lights]
 
 
 class TestDynamic:

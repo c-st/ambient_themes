@@ -182,7 +182,6 @@ class ThemeEngine:
                 color = color_assignment[color_idx] if color_idx < len(color_assignment) else self._theme.palette[0]
                 color_idx += 1
                 data = {
-                    "entity_id": light.entity_id,
                     ATTR_HS_COLOR: (color.hue, color.saturation),
                     ATTR_BRIGHTNESS: brightness_val,
                     ATTR_TRANSITION: self._transition,
@@ -190,21 +189,27 @@ class ThemeEngine:
             elif light.role == LightRole.TEMPERATURE_CARRIER:
                 color_temp = random.randint(self._theme.color_temp_cool, self._theme.color_temp_warm)
                 data = {
-                    "entity_id": light.entity_id,
                     ATTR_COLOR_TEMP: color_temp,
                     ATTR_BRIGHTNESS: brightness_val,
                     ATTR_TRANSITION: self._transition,
                 }
             elif light.role == LightRole.ATMOSPHERE_CARRIER:
                 data = {
-                    "entity_id": light.entity_id,
                     ATTR_BRIGHTNESS: brightness_val,
                     ATTR_TRANSITION: self._transition,
                 }
             else:  # PARTICIPANT
-                data = {"entity_id": light.entity_id}
+                data = {}
 
-            tasks.append(self._hass.services.async_call(LIGHT_DOMAIN, SERVICE_TURN_ON, data, blocking=False))
+            tasks.append(
+                self._hass.services.async_call(
+                    LIGHT_DOMAIN,
+                    SERVICE_TURN_ON,
+                    data,
+                    target={"entity_id": light.entity_id},
+                    blocking=False,
+                )
+            )
 
         await asyncio.gather(*tasks)
 
@@ -252,7 +257,8 @@ class ThemeEngine:
             self._hass.services.async_call(
                 LIGHT_DOMAIN,
                 SERVICE_TURN_OFF,
-                {"entity_id": lt.entity_id, ATTR_TRANSITION: self._transition},
+                {ATTR_TRANSITION: self._transition},
+                target={"entity_id": lt.entity_id},
                 blocking=False,
             )
             for lt in self._lights
