@@ -38,8 +38,6 @@ async def test_user_step_shows_form(hass: HomeAssistant) -> None:
 
 async def test_user_step_creates_entry(hass: HomeAssistant) -> None:
     """Submitting a valid area_id should create a config entry."""
-    # Set up an area in the registry
-    area_reg = hass.helpers.area_registry.async_get(hass) if hasattr(hass.helpers, "area_registry") else None
     from homeassistant.helpers import area_registry as ar
     area_registry = ar.async_get(hass)
     area = area_registry.async_create("Living Room")
