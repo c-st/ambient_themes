@@ -1,4 +1,6 @@
 """Tests for the themes module."""
+import dataclasses
+
 import pytest
 
 from custom_components.ambient_themes.themes import (
@@ -17,7 +19,7 @@ class TestThemeColor:
 
     def test_frozen(self):
         color = ThemeColor(hue=30.0, saturation=50.0)
-        with pytest.raises(Exception):
+        with pytest.raises(dataclasses.FrozenInstanceError):
             color.hue = 60.0  # type: ignore[misc]
 
 
@@ -36,7 +38,7 @@ class TestThemeMood:
 
     def test_frozen(self):
         mood = ThemeMood()
-        with pytest.raises(Exception):
+        with pytest.raises(dataclasses.FrozenInstanceError):
             mood.warmth = 0.8  # type: ignore[misc]
 
 
@@ -75,7 +77,7 @@ class TestTheme:
             palette=(ThemeColor(30, 50),),
             mood=ThemeMood(),
         )
-        with pytest.raises(Exception):
+        with pytest.raises(dataclasses.FrozenInstanceError):
             theme.id = "other"  # type: ignore[misc]
 
 

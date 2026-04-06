@@ -1,5 +1,4 @@
 """Tests for the light_roles module."""
-import pytest
 
 from homeassistant.components.light import ColorMode
 

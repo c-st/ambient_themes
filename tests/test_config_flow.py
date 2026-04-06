@@ -1,8 +1,6 @@
 """Tests for the config and options flow."""
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
-
 import pytest
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
@@ -14,9 +12,6 @@ from custom_components.ambient_themes.const import (
     CONF_CONTRAST,
     CONF_DYNAMIC,
     CONF_THEME_ID,
-    DEFAULT_CONTRAST,
-    DEFAULT_DYNAMIC,
-    DEFAULT_THEME_ID,
     DOMAIN,
 )
 

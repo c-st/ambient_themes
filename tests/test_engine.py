@@ -1,21 +1,15 @@
 """Tests for the ThemeEngine."""
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
-
-import pytest
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP,
     ATTR_HS_COLOR,
     ATTR_TRANSITION,
-    ColorMode,
 )
-from homeassistant.const import SERVICE_TURN_OFF, SERVICE_TURN_ON
+from homeassistant.const import SERVICE_TURN_OFF
 
-from custom_components.ambient_themes.const import LightRole
 from custom_components.ambient_themes.engine import ThemeEngine
-from custom_components.ambient_themes.light_roles import ManagedLight
 from custom_components.ambient_themes.themes import BUILTIN_THEMES, ThemeColor
 
 
@@ -199,7 +193,6 @@ class TestDynamic:
     async def test_stop_cancels_task(self, mock_hass, warm_glow_theme, rgb_light):
         engine = ThemeEngine(mock_hass, [rgb_light], warm_glow_theme)
         await engine.start_dynamic()
-        task = engine._cycle_task
         engine.stop()
         assert engine._cycle_task is None
 

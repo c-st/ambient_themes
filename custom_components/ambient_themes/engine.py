@@ -9,6 +9,8 @@ from homeassistant.components.light import (
     ATTR_COLOR_TEMP,
     ATTR_HS_COLOR,
     ATTR_TRANSITION,
+)
+from homeassistant.components.light import (
     DOMAIN as LIGHT_DOMAIN,
 )
 from homeassistant.const import SERVICE_TURN_OFF, SERVICE_TURN_ON, STATE_ON
@@ -81,6 +83,7 @@ class ThemeEngine:
             # Make sunset timezone-aware if it isn't
             if sunset.tzinfo is None:
                 import datetime as dt
+
                 from homeassistant.util.dt import as_utc
                 sunset = as_utc(dt.datetime.combine(today, sunset.time()))
 

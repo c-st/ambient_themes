@@ -1,11 +1,13 @@
 """Light role detection and management for the Ambient Themes integration."""
 from __future__ import annotations
 
+import contextlib
 from dataclasses import dataclass
 
 from homeassistant.components.light import ColorMode
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 
 from .const import LightRole
 
@@ -40,10 +42,8 @@ def detect_role(supported_color_modes: set | list | None) -> LightRole:
         else:
             s = str(mode).lower()
             string_modes.add(s)
-            try:
+            with contextlib.suppress(ValueError):
                 enum_modes.add(ColorMode(s))
-            except ValueError:
-                pass
 
     if enum_modes & _COLOR_CARRIER_MODES or string_modes & _COLOR_CARRIER_STRINGS:
         return LightRole.COLOR_CARRIER

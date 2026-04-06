@@ -3,20 +3,14 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
-from homeassistant.components.light import ColorMode
-
 from custom_components.ambient_themes.const import (
     CONF_AREA_ID,
     CONF_DYNAMIC,
     CONF_THEME_ID,
     DEFAULT_DYNAMIC,
     DEFAULT_THEME_ID,
-    DOMAIN,
-    LightRole,
 )
 from custom_components.ambient_themes.instance import AmbientInstance
-from custom_components.ambient_themes.light_roles import ManagedLight
 from custom_components.ambient_themes.themes import BUILTIN_THEMES
 
 
