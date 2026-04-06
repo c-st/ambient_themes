@@ -1,0 +1,65 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Ambient Themes",
+        "description": "Select the Home Assistant area to control with ambient themes.",
+        "data": {
+          "area_id": "Area"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This area is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Ambient Themes Options",
+        "data": {
+          "theme_id": "Theme",
+          "excluded_entities": "Excluded entities",
+          "dynamic": "Dynamic cycling",
+          "smart_shuffle": "Smart shuffle",
+          "cycle_interval": "Cycle interval",
+          "transition": "Transition duration",
+          "contrast": "Brightness contrast",
+          "brightness_curve": "Sunset brightness curve",
+          "survive_restart": "Restore on HA restart"
+        },
+        "data_description": {
+          "excluded_entities": "Light entities in this area to exclude from ambient control.",
+          "dynamic": "Automatically shift colors on a timer.",
+          "smart_shuffle": "Order color assignments for smooth hue transitions.",
+          "cycle_interval": "How often (in seconds) to change the color assignment when dynamic cycling is enabled.",
+          "contrast": "Brightness spread across lights (0 = uniform, 100 = maximum spread).",
+          "brightness_curve": "Gradually dim lights relative to time after sunset.",
+          "survive_restart": "Automatically restore the active state after a Home Assistant restart."
+        }
+      }
+    }
+  },
+  "entity": {
+    "switch": {
+      "ambient_switch": {
+        "name": "Ambient"
+      }
+    },
+    "select": {
+      "ambient_theme": {
+        "name": "Theme"
+      }
+    },
+    "number": {
+      "ambient_brightness": {
+        "name": "Brightness override"
+      }
+    },
+    "sensor": {
+      "ambient_status": {
+        "name": "Status"
+      }
+    }
+  }
+}

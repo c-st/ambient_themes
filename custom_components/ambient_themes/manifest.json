@@ -1,0 +1,13 @@
+{
+  "domain": "ambient_themes",
+  "name": "Ambient Themes",
+  "codeowners": ["@c-st"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/c-st/hass-ambient-themes",
+  "integration_type": "device",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/c-st/hass-ambient-themes/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

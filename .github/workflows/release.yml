@@ -1,0 +1,24 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Zip integration
+        run: |
+          cd custom_components
+          zip -r ../ambient_themes.zip ambient_themes/
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ambient_themes.zip
+          generate_release_notes: true
