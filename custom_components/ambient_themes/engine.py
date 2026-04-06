@@ -55,6 +55,7 @@ class ThemeEngine:
         self._hue_offset: float = 0.0
         self._running = False
         self._cycle_task: asyncio.Task | None = None
+        self._brightness_snapshot: dict[str, int | None] = {}
 
     @property
     def is_running(self) -> bool:
@@ -232,15 +233,28 @@ class ThemeEngine:
 
     async def apply_initial(self) -> None:
         """Apply theme instantly (transition=0) then restore original transition."""
+        if not self._brightness_snapshot:
+            self._snapshot_brightness()
         saved = self._transition
         self._transition = 0
         await self.apply()
         self._transition = saved
 
+    def _snapshot_brightness(self) -> None:
+        """Capture the current brightness of all ATMOSPHERE_CARRIER lights before applying theme."""
+        for light in self._lights:
+            if light.role == LightRole.ATMOSPHERE_CARRIER:
+                state = self._hass.states.get(light.entity_id)
+                if state is not None and state.state == STATE_ON:
+                    self._brightness_snapshot[light.entity_id] = state.attributes.get(ATTR_BRIGHTNESS)
+                else:
+                    self._brightness_snapshot[light.entity_id] = None
+
     async def start_dynamic(self) -> None:
         """Start dynamic cycling: apply immediately, then loop on interval."""
         if self._running:
             return
+        self._snapshot_brightness()
         self._running = True
         await self.apply_initial()
         self._cycle_task = self._hass.async_create_task(self._dynamic_loop())
@@ -270,17 +284,48 @@ class ThemeEngine:
             self._cycle_task = None
 
     async def turn_off_lights(self) -> None:
-        """Stop cycling and turn off all managed lights."""
+        """Stop cycling and restore/turn off managed lights.
+
+        ATMOSPHERE_CARRIER lights (brightness-only) are restored to their pre-ambient
+        brightness if they were on before ambient started. All other lights are turned off
+        so that adaptive lighting or other automations can take control.
+        """
         self.stop()
-        tasks = [
-            self._hass.services.async_call(
-                LIGHT_DOMAIN,
-                SERVICE_TURN_OFF,
-                {ATTR_TRANSITION: self._transition},
-                target={"entity_id": lt.entity_id},
-                blocking=False,
-            )
-            for lt in self._lights
-        ]
+        tasks = []
+        for lt in self._lights:
+            if lt.role == LightRole.ATMOSPHERE_CARRIER:
+                prior_brightness = self._brightness_snapshot.get(lt.entity_id)
+                if prior_brightness is not None:
+                    # Restore to pre-ambient brightness
+                    tasks.append(
+                        self._hass.services.async_call(
+                            LIGHT_DOMAIN,
+                            SERVICE_TURN_ON,
+                            {ATTR_BRIGHTNESS: prior_brightness, ATTR_TRANSITION: self._transition},
+                            target={"entity_id": lt.entity_id},
+                            blocking=False,
+                        )
+                    )
+                else:
+                    # Was off before ambient started — turn it off
+                    tasks.append(
+                        self._hass.services.async_call(
+                            LIGHT_DOMAIN,
+                            SERVICE_TURN_OFF,
+                            {ATTR_TRANSITION: self._transition},
+                            target={"entity_id": lt.entity_id},
+                            blocking=False,
+                        )
+                    )
+            else:
+                tasks.append(
+                    self._hass.services.async_call(
+                        LIGHT_DOMAIN,
+                        SERVICE_TURN_OFF,
+                        {ATTR_TRANSITION: self._transition},
+                        target={"entity_id": lt.entity_id},
+                        blocking=False,
+                    )
+                )
         if tasks:
             await asyncio.gather(*tasks)
