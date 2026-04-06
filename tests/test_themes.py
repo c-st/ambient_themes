@@ -86,18 +86,13 @@ class TestBuiltinThemes:
     def test_all_themes_registered(self):
         expected_ids = {
             "warm_glow",
-            "midsummer_night",
-            "nordic_twilight",
-            "autumn_garden",
-            "moonlight",
-            "tropical_evening",
             "candlelight",
-            "winter_frost",
-            "deep_forest",
-            "party",
+            "nordic_twilight",
+            "tropical_evening",
             "aurora",
             "sunset_chase",
             "ocean_pulse",
+            "party",
         }
         assert set(BUILTIN_THEMES.keys()) == expected_ids
 
@@ -126,9 +121,9 @@ class TestBuiltinThemes:
         party = BUILTIN_THEMES["party"]
         assert party.mood.energy > 0.8
 
-    def test_moonlight_low_brightness(self):
-        moonlight = BUILTIN_THEMES["moonlight"]
-        assert moonlight.default_brightness <= 35
+    def test_candlelight_high_variation(self):
+        candlelight = BUILTIN_THEMES["candlelight"]
+        assert candlelight.brightness_variation >= 35
 
     def test_all_palette_hues_in_range(self):
         for theme in BUILTIN_THEMES.values():
