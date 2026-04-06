@@ -37,6 +37,8 @@ class ThemeEngine:
         brightness_curve: bool = False,
         contrast: int = 30,
         brightness_override: int | None = None,
+        stagger_ms: int = 0,
+        hue_drift: int = 0,
     ) -> None:
         self._hass = hass
         self._lights = lights
@@ -48,6 +50,9 @@ class ThemeEngine:
         self._brightness_curve = brightness_curve
         self._contrast = contrast
         self._brightness_override = brightness_override
+        self._stagger_ms = stagger_ms
+        self._hue_drift = hue_drift
+        self._hue_offset: float = 0.0
         self._running = False
         self._cycle_task: asyncio.Task | None = None
 
@@ -151,6 +156,12 @@ class ThemeEngine:
         random.shuffle(values)
         return [max(5, min(100, v)) for v in values]
 
+    def _drift_palette(self, palette: list[ThemeColor]) -> list[ThemeColor]:
+        """Return a new palette with all hues rotated by the current hue offset."""
+        if self._hue_offset == 0.0:
+            return palette
+        return [ThemeColor(hue=(c.hue + self._hue_offset) % 360, saturation=c.saturation) for c in palette]
+
     def _assign_colors(self) -> list[ThemeColor]:
         """Assign shuffled palette colors to color carrier lights."""
         color_lights = [lt for lt in self._lights if lt.role == LightRole.COLOR_CARRIER]
@@ -161,8 +172,21 @@ class ThemeEngine:
         while len(palette) < len(color_lights):
             palette.extend(list(self._theme.palette))
         palette = palette[: len(color_lights)]
+        palette = self._drift_palette(palette)
 
         return self._shuffle_colors(palette)
+
+    async def _call_light(self, light: ManagedLight, data: dict, delay_ms: int = 0) -> None:
+        """Call the light service, optionally after a stagger delay."""
+        if delay_ms > 0:
+            await asyncio.sleep(delay_ms / 1000)
+        await self._hass.services.async_call(
+            LIGHT_DOMAIN,
+            SERVICE_TURN_ON,
+            data,
+            target={"entity_id": light.entity_id},
+            blocking=False,
+        )
 
     async def apply(self) -> None:
         """Apply the current theme to all managed lights."""
@@ -177,6 +201,7 @@ class ThemeEngine:
 
         for i, light in enumerate(self._lights):
             brightness_val = self._brightness_pct_to_value(brightnesses[i])
+            delay_ms = i * self._stagger_ms
 
             if light.role == LightRole.COLOR_CARRIER:
                 color = color_assignment[color_idx] if color_idx < len(color_assignment) else self._theme.palette[0]
@@ -201,15 +226,7 @@ class ThemeEngine:
             else:  # PARTICIPANT
                 data = {}
 
-            tasks.append(
-                self._hass.services.async_call(
-                    LIGHT_DOMAIN,
-                    SERVICE_TURN_ON,
-                    data,
-                    target={"entity_id": light.entity_id},
-                    blocking=False,
-                )
-            )
+            tasks.append(self._call_light(light, data, delay_ms))
 
         await asyncio.gather(*tasks)
 
@@ -241,6 +258,8 @@ class ThemeEngine:
             if not any_on:
                 self._running = False
                 break
+            if self._hue_drift:
+                self._hue_offset = (self._hue_offset + self._hue_drift) % 360
             await self.apply()
 
     def stop(self) -> None:

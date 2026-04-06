@@ -13,7 +13,9 @@ from .const import (
     CONF_CYCLE_INTERVAL,
     CONF_DYNAMIC,
     CONF_EXCLUDED_ENTITIES,
+    CONF_HUE_DRIFT,
     CONF_SMART_SHUFFLE,
+    CONF_STAGGER_MS,
     CONF_THEME_ID,
     CONF_TRANSITION,
     DEFAULT_BRIGHTNESS_CURVE,
@@ -21,7 +23,9 @@ from .const import (
     DEFAULT_CYCLE_INTERVAL,
     DEFAULT_DYNAMIC,
     DEFAULT_EXCLUDED_ENTITIES,
+    DEFAULT_HUE_DRIFT,
     DEFAULT_SMART_SHUFFLE,
+    DEFAULT_STAGGER_MS,
     DEFAULT_THEME_ID,
     DEFAULT_TRANSITION,
 )
@@ -97,6 +101,8 @@ class AmbientInstance:
             smart_shuffle=opts.get(CONF_SMART_SHUFFLE, DEFAULT_SMART_SHUFFLE),
             brightness_curve=opts.get(CONF_BRIGHTNESS_CURVE, DEFAULT_BRIGHTNESS_CURVE),
             contrast=opts.get(CONF_CONTRAST, DEFAULT_CONTRAST),
+            stagger_ms=opts.get(CONF_STAGGER_MS, DEFAULT_STAGGER_MS),
+            hue_drift=opts.get(CONF_HUE_DRIFT, DEFAULT_HUE_DRIFT),
         )
         self._engine = engine
 

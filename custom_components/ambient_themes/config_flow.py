@@ -28,7 +28,9 @@ from .const import (
     CONF_CYCLE_INTERVAL,
     CONF_DYNAMIC,
     CONF_EXCLUDED_ENTITIES,
+    CONF_HUE_DRIFT,
     CONF_SMART_SHUFFLE,
+    CONF_STAGGER_MS,
     CONF_SURVIVE_RESTART,
     CONF_THEME_ID,
     CONF_TRANSITION,
@@ -37,7 +39,9 @@ from .const import (
     DEFAULT_CYCLE_INTERVAL,
     DEFAULT_DYNAMIC,
     DEFAULT_EXCLUDED_ENTITIES,
+    DEFAULT_HUE_DRIFT,
     DEFAULT_SMART_SHUFFLE,
+    DEFAULT_STAGGER_MS,
     DEFAULT_SURVIVE_RESTART,
     DEFAULT_THEME_ID,
     DEFAULT_TRANSITION,
@@ -123,6 +127,14 @@ class AmbientThemesOptionsFlow(config_entries.OptionsFlow):
                 vol.Optional(
                     CONF_SURVIVE_RESTART, default=opts.get(CONF_SURVIVE_RESTART, DEFAULT_SURVIVE_RESTART)
                 ): BooleanSelector(),
+                vol.Optional(
+                    CONF_STAGGER_MS, default=opts.get(CONF_STAGGER_MS, DEFAULT_STAGGER_MS)
+                ): NumberSelector(
+                    NumberSelectorConfig(min=0, max=2000, step=100, unit_of_measurement="ms", mode=NumberSelectorMode.BOX)
+                ),
+                vol.Optional(CONF_HUE_DRIFT, default=opts.get(CONF_HUE_DRIFT, DEFAULT_HUE_DRIFT)): NumberSelector(
+                    NumberSelectorConfig(min=0, max=120, step=5, unit_of_measurement="°", mode=NumberSelectorMode.SLIDER)
+                ),
             }
         )
 

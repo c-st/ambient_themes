@@ -26,7 +26,9 @@
           "transition": "Transition duration",
           "contrast": "Brightness contrast",
           "brightness_curve": "Sunset brightness curve",
-          "survive_restart": "Restore on HA restart"
+          "survive_restart": "Restore on HA restart",
+          "stagger_ms": "Wave stagger",
+          "hue_drift": "Hue drift per cycle"
         },
         "data_description": {
           "excluded_entities": "Light entities in this area to exclude from ambient control.",
@@ -35,7 +37,9 @@
           "cycle_interval": "How often (in seconds) to change the color assignment when dynamic cycling is enabled.",
           "contrast": "Brightness spread across lights (0 = uniform, 100 = maximum spread).",
           "brightness_curve": "Gradually dim lights relative to time after sunset.",
-          "survive_restart": "Automatically restore the active state after a Home Assistant restart."
+          "survive_restart": "Automatically restore the active state after a Home Assistant restart.",
+          "stagger_ms": "Delay (ms) between each light's update, creating a wave ripple effect. 0 = all lights change at once.",
+          "hue_drift": "Degrees to rotate the palette hues each cycle, creating a slow continuous color evolution."
         }
       }
     }

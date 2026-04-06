@@ -83,7 +83,7 @@ class TestTheme:
 
 
 class TestBuiltinThemes:
-    def test_all_ten_themes_registered(self):
+    def test_all_themes_registered(self):
         expected_ids = {
             "warm_glow",
             "midsummer_night",
@@ -95,6 +95,9 @@ class TestBuiltinThemes:
             "winter_frost",
             "deep_forest",
             "party",
+            "aurora",
+            "sunset_chase",
+            "ocean_pulse",
         }
         assert set(BUILTIN_THEMES.keys()) == expected_ids
 

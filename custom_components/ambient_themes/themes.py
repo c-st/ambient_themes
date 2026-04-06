@@ -79,16 +79,17 @@ _register(
         name="Midsummer Night",
         description="Warm golden tones fading into deep amber",
         palette=(
-            ThemeColor(hue=35, saturation=90),
-            ThemeColor(hue=25, saturation=95),
-            ThemeColor(hue=15, saturation=85),
-            ThemeColor(hue=40, saturation=80),
+            ThemeColor(hue=35, saturation=95),
+            ThemeColor(hue=20, saturation=100),
+            ThemeColor(hue=10, saturation=90),
+            ThemeColor(hue=45, saturation=85),
+            ThemeColor(hue=5, saturation=100),
         ),
-        mood=ThemeMood(warmth=0.9, energy=0.2, contrast=0.4),
+        mood=ThemeMood(warmth=0.9, energy=0.3, contrast=0.5),
         color_temp_mireds=400,
-        color_temp_range=50,
-        default_brightness=70,
-        brightness_variation=15,
+        color_temp_range=60,
+        default_brightness=72,
+        brightness_variation=25,
     )
 )
 
@@ -154,17 +155,18 @@ _register(
         name="Tropical Evening",
         description="Teals, corals, warm pinks",
         palette=(
-            ThemeColor(hue=175, saturation=70),
-            ThemeColor(hue=10, saturation=75),
-            ThemeColor(hue=340, saturation=60),
-            ThemeColor(hue=180, saturation=50),
-            ThemeColor(hue=15, saturation=65),
+            ThemeColor(hue=175, saturation=85),
+            ThemeColor(hue=10, saturation=90),
+            ThemeColor(hue=335, saturation=75),
+            ThemeColor(hue=185, saturation=70),
+            ThemeColor(hue=355, saturation=80),
+            ThemeColor(hue=20, saturation=85),
         ),
-        mood=ThemeMood(warmth=0.55, energy=0.4, contrast=0.5),
+        mood=ThemeMood(warmth=0.55, energy=0.5, contrast=0.6),
         color_temp_mireds=340,
-        color_temp_range=50,
-        default_brightness=65,
-        brightness_variation=15,
+        color_temp_range=60,
+        default_brightness=68,
+        brightness_variation=25,
     )
 )
 
@@ -174,16 +176,17 @@ _register(
         name="Candlelight",
         description="Flickering warm tones",
         palette=(
-            ThemeColor(hue=30, saturation=85),
-            ThemeColor(hue=25, saturation=90),
-            ThemeColor(hue=35, saturation=75),
-            ThemeColor(hue=20, saturation=95),
+            ThemeColor(hue=30, saturation=90),
+            ThemeColor(hue=22, saturation=95),
+            ThemeColor(hue=38, saturation=80),
+            ThemeColor(hue=15, saturation=100),
+            ThemeColor(hue=42, saturation=85),
         ),
-        mood=ThemeMood(warmth=0.95, energy=0.3, contrast=0.6),
+        mood=ThemeMood(warmth=0.95, energy=0.4, contrast=0.7),
         color_temp_mireds=450,
-        color_temp_range=30,
-        default_brightness=50,
-        brightness_variation=25,
+        color_temp_range=50,
+        default_brightness=52,
+        brightness_variation=35,
     )
 )
 
@@ -243,5 +246,68 @@ _register(
         color_temp_range=100,
         default_brightness=85,
         brightness_variation=20,
+    )
+)
+
+_register(
+    Theme(
+        id="aurora",
+        name="Aurora",
+        description="Northern lights — green, violet, teal in slow sweeping waves",
+        palette=(
+            ThemeColor(hue=145, saturation=90),
+            ThemeColor(hue=280, saturation=85),
+            ThemeColor(hue=165, saturation=80),
+            ThemeColor(hue=260, saturation=95),
+            ThemeColor(hue=185, saturation=75),
+            ThemeColor(hue=300, saturation=80),
+        ),
+        mood=ThemeMood(warmth=0.25, energy=0.6, contrast=0.65),
+        color_temp_mireds=260,
+        color_temp_range=60,
+        default_brightness=65,
+        brightness_variation=30,
+    )
+)
+
+_register(
+    Theme(
+        id="sunset_chase",
+        name="Sunset Chase",
+        description="Deep oranges melting into magenta and violet",
+        palette=(
+            ThemeColor(hue=22, saturation=100),
+            ThemeColor(hue=330, saturation=95),
+            ThemeColor(hue=270, saturation=85),
+            ThemeColor(hue=8, saturation=100),
+            ThemeColor(hue=345, saturation=90),
+            ThemeColor(hue=255, saturation=80),
+        ),
+        mood=ThemeMood(warmth=0.65, energy=0.7, contrast=0.7),
+        color_temp_mireds=370,
+        color_temp_range=80,
+        default_brightness=70,
+        brightness_variation=30,
+    )
+)
+
+_register(
+    Theme(
+        id="ocean_pulse",
+        name="Ocean Pulse",
+        description="Cyan, sapphire, and aqua rippling through the room",
+        palette=(
+            ThemeColor(hue=190, saturation=90),
+            ThemeColor(hue=215, saturation=95),
+            ThemeColor(hue=175, saturation=80),
+            ThemeColor(hue=200, saturation=100),
+            ThemeColor(hue=230, saturation=85),
+            ThemeColor(hue=160, saturation=75),
+        ),
+        mood=ThemeMood(warmth=0.15, energy=0.65, contrast=0.6),
+        color_temp_mireds=250,
+        color_temp_range=60,
+        default_brightness=65,
+        brightness_variation=30,
     )
 )

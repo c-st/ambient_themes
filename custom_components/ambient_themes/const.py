@@ -18,6 +18,8 @@ CONF_SMART_SHUFFLE = "smart_shuffle"
 CONF_BRIGHTNESS_CURVE = "brightness_curve"
 CONF_CONTRAST = "contrast"
 CONF_SURVIVE_RESTART = "survive_restart"
+CONF_STAGGER_MS = "stagger_ms"
+CONF_HUE_DRIFT = "hue_drift"
 
 # Defaults
 DEFAULT_THEME_ID = "warm_glow"
@@ -29,6 +31,8 @@ DEFAULT_SMART_SHUFFLE = True
 DEFAULT_BRIGHTNESS_CURVE = False
 DEFAULT_CONTRAST = 30
 DEFAULT_SURVIVE_RESTART = True
+DEFAULT_STAGGER_MS = 0
+DEFAULT_HUE_DRIFT = 0
 
 # Brightness curve: list of (minutes_after_sunset, brightness_percent) tuples
 DEFAULT_BRIGHTNESS_CURVE_POINTS: list[tuple[int, int]] = [
