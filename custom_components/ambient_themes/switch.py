@@ -25,6 +25,7 @@ async def async_setup_entry(
 class AmbientThemeSwitch(SwitchEntity, RestoreEntity):
     """Switch to activate/deactivate ambient lighting for an area."""
 
+    _attr_has_entity_name = True
     _attr_translation_key = "ambient_switch"
 
     def __init__(self, instance: AmbientInstance, entry: ConfigEntry) -> None:

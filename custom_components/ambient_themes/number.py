@@ -24,6 +24,7 @@ async def async_setup_entry(
 class AmbientBrightnessOverride(NumberEntity):
     """Brightness override slider (0 = use theme default, >0 = override)."""
 
+    _attr_has_entity_name = True
     _attr_translation_key = "ambient_brightness"
     _attr_native_min_value = 0
     _attr_native_max_value = 100

@@ -25,6 +25,7 @@ async def async_setup_entry(
 class AmbientThemeSelect(SelectEntity):
     """Selects the active ambient theme."""
 
+    _attr_has_entity_name = True
     _attr_translation_key = "ambient_theme"
 
     def __init__(self, instance: AmbientInstance, entry: ConfigEntry) -> None:

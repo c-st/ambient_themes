@@ -26,6 +26,7 @@ async def async_setup_entry(
 class AmbientStatusSensor(SensorEntity):
     """Shows the current status and light role summary for an ambient instance."""
 
+    _attr_has_entity_name = True
     _attr_translation_key = "ambient_status"
 
     def __init__(self, instance: AmbientInstance) -> None:
