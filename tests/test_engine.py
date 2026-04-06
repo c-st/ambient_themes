@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock
-
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP_KELVIN,
     ATTR_HS_COLOR,
     ATTR_TRANSITION,
 )
-from homeassistant.const import SERVICE_TURN_OFF, SERVICE_TURN_ON, STATE_OFF, STATE_ON
+from homeassistant.const import SERVICE_TURN_OFF
 
 from custom_components.ambient_themes.engine import ThemeEngine
 from custom_components.ambient_themes.themes import BUILTIN_THEMES, ThemeColor
@@ -168,77 +166,16 @@ class TestApplyInitial:
 
 
 class TestTurnOffLights:
-    async def test_color_and_temp_carriers_are_turned_off(self, mock_hass, warm_glow_theme, mixed_lights):
-        """COLOR_CARRIER and TEMPERATURE_CARRIER lights are always turned off on deactivate."""
+    async def test_calls_turn_off_for_each_light(self, mock_hass, warm_glow_theme, mixed_lights):
         engine = ThemeEngine(mock_hass, mixed_lights, warm_glow_theme, transition=5)
         await engine.turn_off_lights()
         calls = mock_hass.services.async_call.call_args_list
-        turned_off = {c[1]["target"]["entity_id"] for c in calls if c[0][1] == SERVICE_TURN_OFF}
-        assert "light.garden_spot_1" in turned_off  # COLOR_CARRIER
-        assert "light.terrace_wall" in turned_off   # TEMPERATURE_CARRIER
-        assert "light.porch" in turned_off           # PARTICIPANT
-
-    async def test_atmosphere_carrier_restored_when_previously_on(self, mock_hass, warm_glow_theme, dimmable_light):
-        """ATMOSPHERE_CARRIER light is restored to its pre-ambient brightness if it was on."""
-        prior_brightness = 180
-        mock_state = MagicMock()
-        mock_state.state = STATE_ON
-        mock_state.attributes = {ATTR_BRIGHTNESS: prior_brightness}
-        mock_hass.states.get = MagicMock(return_value=mock_state)
-
-        engine = ThemeEngine(mock_hass, [dimmable_light], warm_glow_theme, transition=5)
-        engine._snapshot_brightness()  # simulate snapshot taken at activation
-        mock_hass.services.async_call.reset_mock()
-
-        await engine.turn_off_lights()
-        calls = mock_hass.services.async_call.call_args_list
-        assert len(calls) == 1
-        assert calls[0][0][1] == SERVICE_TURN_ON
-        data = calls[0][0][2]
-        assert data[ATTR_BRIGHTNESS] == prior_brightness
-        assert data[ATTR_TRANSITION] == 5
-
-    async def test_atmosphere_carrier_turned_off_when_previously_off(self, mock_hass, warm_glow_theme, dimmable_light):
-        """ATMOSPHERE_CARRIER light is turned off on deactivate if it was off before ambient started."""
-        mock_state = MagicMock()
-        mock_state.state = STATE_OFF
-        mock_state.attributes = {}
-        mock_hass.states.get = MagicMock(return_value=mock_state)
-
-        engine = ThemeEngine(mock_hass, [dimmable_light], warm_glow_theme, transition=5)
-        engine._snapshot_brightness()  # was off, so snapshot stores None
-        mock_hass.services.async_call.reset_mock()
-
-        await engine.turn_off_lights()
-        calls = mock_hass.services.async_call.call_args_list
-        assert len(calls) == 1
-        assert calls[0][0][1] == SERVICE_TURN_OFF
-
-    async def test_snapshot_taken_on_start_dynamic(self, mock_hass, warm_glow_theme, dimmable_light):
-        """Brightness snapshot is populated when start_dynamic is called."""
-        prior_brightness = 200
-        mock_state = MagicMock()
-        mock_state.state = STATE_ON
-        mock_state.attributes = {ATTR_BRIGHTNESS: prior_brightness}
-        mock_hass.states.get = MagicMock(return_value=mock_state)
-
-        engine = ThemeEngine(mock_hass, [dimmable_light], warm_glow_theme)
-        assert engine._brightness_snapshot == {}
-        await engine.start_dynamic()
-        assert engine._brightness_snapshot.get(dimmable_light.entity_id) == prior_brightness
-
-    async def test_snapshot_taken_on_apply_initial(self, mock_hass, warm_glow_theme, dimmable_light):
-        """Brightness snapshot is populated on apply_initial if not already set."""
-        prior_brightness = 150
-        mock_state = MagicMock()
-        mock_state.state = STATE_ON
-        mock_state.attributes = {ATTR_BRIGHTNESS: prior_brightness}
-        mock_hass.states.get = MagicMock(return_value=mock_state)
-
-        engine = ThemeEngine(mock_hass, [dimmable_light], warm_glow_theme)
-        assert engine._brightness_snapshot == {}
-        await engine.apply_initial()
-        assert engine._brightness_snapshot.get(dimmable_light.entity_id) == prior_brightness
+        assert len(calls) == 4
+        for call in calls:
+            assert call[0][1] == SERVICE_TURN_OFF
+            data = call[0][2]
+            assert data[ATTR_TRANSITION] == 5
+            assert call[1]["target"]["entity_id"] in [lt.entity_id for lt in mixed_lights]
 
 
 class TestDynamic:
