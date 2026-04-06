@@ -6,6 +6,7 @@ from typing import Any
 
 import voluptuous as vol
 from homeassistant import config_entries
+from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers.selector import (
     AreaSelector,
@@ -50,7 +51,7 @@ class AmbientThemesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
-    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.FlowResult:
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
             area_id = user_input[CONF_AREA_ID]
             await self.async_set_unique_id(f"{DOMAIN}_{area_id}")
@@ -72,20 +73,17 @@ class AmbientThemesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     def async_get_options_flow(config_entry: config_entries.ConfigEntry) -> AmbientThemesOptionsFlow:
-        return AmbientThemesOptionsFlow(config_entry)
+        return AmbientThemesOptionsFlow()
 
 
 class AmbientThemesOptionsFlow(config_entries.OptionsFlow):
     """Handle the options flow (full configuration)."""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        self._config_entry = config_entry
-
-    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> config_entries.FlowResult:
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+            return self.async_create_entry(data=user_input)
 
-        opts = self._config_entry.options
+        opts = self.config_entry.options
         theme_options = [
             {"value": theme_id, "label": f"{theme.name} — {theme.description}"}
             for theme_id, theme in BUILTIN_THEMES.items()
