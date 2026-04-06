@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
-    ATTR_COLOR_TEMP,
+    ATTR_COLOR_TEMP_KELVIN,
     ATTR_HS_COLOR,
     ATTR_TRANSITION,
 )
@@ -115,7 +115,7 @@ class TestApply:
         assert ATTR_HS_COLOR in data
         assert ATTR_BRIGHTNESS in data
         assert data[ATTR_TRANSITION] == 10
-        assert ATTR_COLOR_TEMP not in data
+        assert ATTR_COLOR_TEMP_KELVIN not in data
         assert target == {"entity_id": rgb_light.entity_id}
 
     async def test_cct_light_gets_color_temp_not_hs(self, mock_hass, warm_glow_theme, cct_light):
@@ -123,9 +123,10 @@ class TestApply:
         await engine.apply()
         call_args = mock_hass.services.async_call.call_args_list[0]
         data = call_args[0][2]
-        assert ATTR_COLOR_TEMP in data
+        assert ATTR_COLOR_TEMP_KELVIN in data
         assert ATTR_HS_COLOR not in data
-        assert 153 <= data[ATTR_COLOR_TEMP] <= 500
+        # kelvin range: 1_000_000/153 ≈ 6536K (cool) down to 1_000_000/500 = 2000K (warm)
+        assert 2000 <= data[ATTR_COLOR_TEMP_KELVIN] <= 6536
 
     async def test_dimmable_light_gets_brightness_only(self, mock_hass, warm_glow_theme, dimmable_light):
         engine = ThemeEngine(mock_hass, [dimmable_light], warm_glow_theme)
@@ -134,7 +135,7 @@ class TestApply:
         data = call_args[0][2]
         assert ATTR_BRIGHTNESS in data
         assert ATTR_HS_COLOR not in data
-        assert ATTR_COLOR_TEMP not in data
+        assert ATTR_COLOR_TEMP_KELVIN not in data
 
     async def test_participant_gets_empty_data_with_target(self, mock_hass, warm_glow_theme, onoff_light):
         engine = ThemeEngine(mock_hass, [onoff_light], warm_glow_theme)

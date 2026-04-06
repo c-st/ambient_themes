@@ -7,7 +7,7 @@ import random
 
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
-    ATTR_COLOR_TEMP,
+    ATTR_COLOR_TEMP_KELVIN,
     ATTR_HS_COLOR,
     ATTR_TRANSITION,
 )
@@ -187,9 +187,9 @@ class ThemeEngine:
                     ATTR_TRANSITION: self._transition,
                 }
             elif light.role == LightRole.TEMPERATURE_CARRIER:
-                color_temp = random.randint(self._theme.color_temp_cool, self._theme.color_temp_warm)
+                mireds = random.randint(self._theme.color_temp_cool, self._theme.color_temp_warm)
                 data = {
-                    ATTR_COLOR_TEMP: color_temp,
+                    ATTR_COLOR_TEMP_KELVIN: round(1_000_000 / mireds),
                     ATTR_BRIGHTNESS: brightness_val,
                     ATTR_TRANSITION: self._transition,
                 }
