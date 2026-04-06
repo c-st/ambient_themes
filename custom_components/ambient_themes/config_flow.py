@@ -7,7 +7,6 @@ from typing import Any
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlowResult
-from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers.selector import (
     AreaSelector,
     AreaSelectorConfig,
@@ -20,6 +19,7 @@ from homeassistant.helpers.selector import (
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
+    TextSelector,
 )
 
 from .const import (
@@ -30,6 +30,7 @@ from .const import (
     CONF_DYNAMIC,
     CONF_EXCLUDED_ENTITIES,
     CONF_HUE_DRIFT,
+    CONF_NAME,
     CONF_SMART_SHUFFLE,
     CONF_STAGGER_MS,
     CONF_SURVIVE_RESTART,
@@ -63,16 +64,19 @@ class AmbientThemesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             await self.async_set_unique_id(f"{DOMAIN}_{unique_key}")
             self._abort_if_unique_id_configured()
 
-            area_reg = ar.async_get(self.hass)
-            names = [(area_reg.async_get_area(aid).name if area_reg.async_get_area(aid) else aid) for aid in area_ids]
             return self.async_create_entry(
-                title="Ambient: " + " + ".join(names),
-                data={CONF_AREA_IDS: area_ids},
+                title=user_input[CONF_NAME],
+                data={CONF_NAME: user_input[CONF_NAME], CONF_AREA_IDS: area_ids},
             )
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({vol.Required(CONF_AREA_IDS): AreaSelector(AreaSelectorConfig(multiple=True))}),
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_NAME): TextSelector(),
+                    vol.Required(CONF_AREA_IDS): AreaSelector(AreaSelectorConfig(multiple=True)),
+                }
+            ),
         )
 
     @staticmethod

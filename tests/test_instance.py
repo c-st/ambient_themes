@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from custom_components.ambient_themes.const import (
     CONF_AREA_IDS,
     CONF_DYNAMIC,
+    CONF_NAME,
     CONF_THEME_ID,
     DEFAULT_DYNAMIC,
     DEFAULT_THEME_ID,
@@ -15,17 +16,17 @@ from custom_components.ambient_themes.instance import AmbientInstance
 from custom_components.ambient_themes.themes import BUILTIN_THEMES
 
 
-def make_entry(area_ids: list[str] | None = None, options: dict | None = None):
+def make_entry(area_ids: list[str] | None = None, name: str = "Living Room", options: dict | None = None):
     """Create a mock config entry."""
     entry = MagicMock()
-    entry.data = {CONF_AREA_IDS: area_ids or ["area_living_room"]}
+    entry.data = {CONF_NAME: name, CONF_AREA_IDS: area_ids or ["area_living_room"]}
     entry.options = options or {}
     return entry
 
 
-def make_instance(mock_hass, area_ids: list[str] | None = None, options=None):
+def make_instance(mock_hass, area_ids: list[str] | None = None, name: str = "Living Room", options=None):
     """Create an AmbientInstance with a mock hass and entry."""
-    entry = make_entry(area_ids, options)
+    entry = make_entry(area_ids, name, options)
     return AmbientInstance(mock_hass, entry)
 
 
@@ -70,37 +71,9 @@ class TestProperties:
         instance = make_instance(mock_hass, options={CONF_DYNAMIC: True})
         assert instance.dynamic is True
 
-    def test_area_name_single_from_registry(self, mock_hass):
-        mock_area = MagicMock()
-        mock_area.name = "Living Room"
-        with patch("custom_components.ambient_themes.instance.ar") as mock_ar:
-            mock_ar.async_get.return_value.async_get_area.return_value = mock_area
-            instance = make_instance(mock_hass, area_ids=["area_living_room"])
-            assert instance.area_name == "Living Room"
-
-    def test_area_name_multiple_joined(self, mock_hass):
-        areas = {"area_garden": MagicMock(name="Garden"), "area_terrace": MagicMock(name="Terrace")}
-        for mock_area in areas.values():
-            mock_area.name = mock_area._mock_name  # ensure .name attribute works
-
-        garden_area = MagicMock()
-        garden_area.name = "Garden"
-        terrace_area = MagicMock()
-        terrace_area.name = "Terrace"
-
-        def get_area(aid):
-            return {"area_garden": garden_area, "area_terrace": terrace_area}.get(aid)
-
-        with patch("custom_components.ambient_themes.instance.ar") as mock_ar:
-            mock_ar.async_get.return_value.async_get_area.side_effect = get_area
-            instance = make_instance(mock_hass, area_ids=["area_garden", "area_terrace"])
-            assert instance.area_name == "Garden + Terrace"
-
-    def test_area_name_fallback_to_id(self, mock_hass):
-        with patch("custom_components.ambient_themes.instance.ar") as mock_ar:
-            mock_ar.async_get.return_value.async_get_area.return_value = None
-            instance = make_instance(mock_hass, area_ids=["area_fallback"])
-            assert instance.area_name == "area_fallback"
+    def test_area_name_from_entry_data(self, mock_hass):
+        instance = make_instance(mock_hass, name="Garden & Terrace")
+        assert instance.area_name == "Garden & Terrace"
 
 
 class TestActivate:

@@ -12,6 +12,7 @@ from custom_components.ambient_themes.const import (
     CONF_AREA_IDS,
     CONF_CONTRAST,
     CONF_DYNAMIC,
+    CONF_NAME,
     CONF_THEME_ID,
     DOMAIN,
 )
@@ -24,68 +25,63 @@ def auto_enable_custom_integrations(enable_custom_integrations):
 
 
 async def test_user_step_shows_form(hass: HomeAssistant) -> None:
-    """The user step should show a form with step_id 'user'."""
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
     assert result["type"] == FlowResultType.FORM
     assert result["step_id"] == "user"
 
 
 async def test_user_step_creates_entry_single_area(hass: HomeAssistant) -> None:
-    """Submitting a single area should create a config entry."""
     from homeassistant.helpers import area_registry as ar
 
-    area_registry = ar.async_get(hass)
-    area = area_registry.async_create("Living Room")
-
+    area = ar.async_get(hass).async_create("Living Room")
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
-    result2 = await hass.config_entries.flow.async_configure(result["flow_id"], user_input={CONF_AREA_IDS: [area.id]})
+    result2 = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input={CONF_NAME: "Lounge", CONF_AREA_IDS: [area.id]}
+    )
     assert result2["type"] == FlowResultType.CREATE_ENTRY
-    assert result2["title"] == "Ambient: Living Room"
+    assert result2["title"] == "Lounge"
+    assert result2["data"][CONF_NAME] == "Lounge"
     assert result2["data"][CONF_AREA_IDS] == [area.id]
 
 
 async def test_user_step_creates_entry_multiple_areas(hass: HomeAssistant) -> None:
-    """Submitting multiple areas should create a combined entry."""
     from homeassistant.helpers import area_registry as ar
 
-    area_registry = ar.async_get(hass)
-    garden = area_registry.async_create("Garden")
-    terrace = area_registry.async_create("Terrace")
-
+    reg = ar.async_get(hass)
+    garden = reg.async_create("Garden")
+    terrace = reg.async_create("Terrace")
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
     result2 = await hass.config_entries.flow.async_configure(
-        result["flow_id"], user_input={CONF_AREA_IDS: [garden.id, terrace.id]}
+        result["flow_id"],
+        user_input={CONF_NAME: "Outside", CONF_AREA_IDS: [garden.id, terrace.id]},
     )
     assert result2["type"] == FlowResultType.CREATE_ENTRY
-    assert "Garden" in result2["title"]
-    assert "Terrace" in result2["title"]
+    assert result2["title"] == "Outside"
     assert set(result2["data"][CONF_AREA_IDS]) == {garden.id, terrace.id}
 
 
 async def test_user_step_aborts_duplicate(hass: HomeAssistant) -> None:
-    """Configuring the same area set twice should abort."""
     from homeassistant.helpers import area_registry as ar
 
-    area_registry = ar.async_get(hass)
-    area = area_registry.async_create("Kitchen")
-
+    area = ar.async_get(hass).async_create("Kitchen")
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
-    await hass.config_entries.flow.async_configure(result["flow_id"], user_input={CONF_AREA_IDS: [area.id]})
+    await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input={CONF_NAME: "Kitchen", CONF_AREA_IDS: [area.id]}
+    )
 
     result2 = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
-    result3 = await hass.config_entries.flow.async_configure(result2["flow_id"], user_input={CONF_AREA_IDS: [area.id]})
+    result3 = await hass.config_entries.flow.async_configure(
+        result2["flow_id"], user_input={CONF_NAME: "Kitchen 2", CONF_AREA_IDS: [area.id]}
+    )
     assert result3["type"] == FlowResultType.ABORT
     assert result3["reason"] == "already_configured"
 
 
 async def test_options_flow_shows_form(hass: HomeAssistant) -> None:
-    """The options flow init step should show a form."""
     from homeassistant.helpers import area_registry as ar
 
-    area_registry = ar.async_get(hass)
-    area = area_registry.async_create("Bedroom")
-
-    entry = MockConfigEntry(domain=DOMAIN, data={CONF_AREA_IDS: [area.id]}, options={})
+    area = ar.async_get(hass).async_create("Bedroom")
+    entry = MockConfigEntry(domain=DOMAIN, data={CONF_NAME: "Bedroom", CONF_AREA_IDS: [area.id]}, options={})
     entry.add_to_hass(hass)
 
     result = await hass.config_entries.options.async_init(entry.entry_id)
@@ -94,17 +90,13 @@ async def test_options_flow_shows_form(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow_saves_all_fields(hass: HomeAssistant) -> None:
-    """Submitting the options form should save all provided fields."""
     from homeassistant.helpers import area_registry as ar
 
-    area_registry = ar.async_get(hass)
-    area = area_registry.async_create("Office")
-
-    entry = MockConfigEntry(domain=DOMAIN, data={CONF_AREA_IDS: [area.id]}, options={})
+    area = ar.async_get(hass).async_create("Office")
+    entry = MockConfigEntry(domain=DOMAIN, data={CONF_NAME: "Office", CONF_AREA_IDS: [area.id]}, options={})
     entry.add_to_hass(hass)
 
     result = await hass.config_entries.options.async_init(entry.entry_id)
-
     user_input = {
         CONF_THEME_ID: "party",
         "excluded_entities": [],
@@ -124,14 +116,13 @@ async def test_options_flow_saves_all_fields(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow_defaults_from_existing_options(hass: HomeAssistant) -> None:
-    """The options form should pre-populate with existing option values."""
     from homeassistant.helpers import area_registry as ar
 
-    area_registry = ar.async_get(hass)
-    area = area_registry.async_create("Hallway")
-
+    area = ar.async_get(hass).async_create("Hallway")
     existing_options = {CONF_THEME_ID: "candlelight", CONF_DYNAMIC: True, CONF_CONTRAST: 75}
-    entry = MockConfigEntry(domain=DOMAIN, data={CONF_AREA_IDS: [area.id]}, options=existing_options)
+    entry = MockConfigEntry(
+        domain=DOMAIN, data={CONF_NAME: "Hallway", CONF_AREA_IDS: [area.id]}, options=existing_options
+    )
     entry.add_to_hass(hass)
 
     result = await hass.config_entries.options.async_init(entry.entry_id)

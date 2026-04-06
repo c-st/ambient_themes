@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import area_registry as ar
 
 from .const import (
     CONF_AREA_IDS,
@@ -14,6 +13,7 @@ from .const import (
     CONF_DYNAMIC,
     CONF_EXCLUDED_ENTITIES,
     CONF_HUE_DRIFT,
+    CONF_NAME,
     CONF_SMART_SHUFFLE,
     CONF_STAGGER_MS,
     CONF_THEME_ID,
@@ -55,11 +55,7 @@ class AmbientInstance:
 
     @property
     def area_name(self) -> str:
-        area_reg = ar.async_get(self._hass)
-        names = [
-            (area_reg.async_get_area(aid).name or aid) if area_reg.async_get_area(aid) else aid for aid in self.area_ids
-        ]
-        return " + ".join(names)
+        return self._entry.data[CONF_NAME]
 
     @property
     def theme_id(self) -> str:
