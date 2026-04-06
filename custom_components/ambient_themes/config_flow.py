@@ -127,13 +127,15 @@ class AmbientThemesOptionsFlow(config_entries.OptionsFlow):
                 vol.Optional(
                     CONF_SURVIVE_RESTART, default=opts.get(CONF_SURVIVE_RESTART, DEFAULT_SURVIVE_RESTART)
                 ): BooleanSelector(),
-                vol.Optional(
-                    CONF_STAGGER_MS, default=opts.get(CONF_STAGGER_MS, DEFAULT_STAGGER_MS)
-                ): NumberSelector(
-                    NumberSelectorConfig(min=0, max=2000, step=100, unit_of_measurement="ms", mode=NumberSelectorMode.BOX)
+                vol.Optional(CONF_STAGGER_MS, default=opts.get(CONF_STAGGER_MS, DEFAULT_STAGGER_MS)): NumberSelector(
+                    NumberSelectorConfig(
+                        min=0, max=2000, step=100, unit_of_measurement="ms", mode=NumberSelectorMode.BOX
+                    )
                 ),
                 vol.Optional(CONF_HUE_DRIFT, default=opts.get(CONF_HUE_DRIFT, DEFAULT_HUE_DRIFT)): NumberSelector(
-                    NumberSelectorConfig(min=0, max=120, step=5, unit_of_measurement="°", mode=NumberSelectorMode.SLIDER)
+                    NumberSelectorConfig(
+                        min=0, max=120, step=5, unit_of_measurement="°", mode=NumberSelectorMode.SLIDER
+                    )
                 ),
             }
         )
